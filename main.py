@@ -1,10 +1,5 @@
-import requests
-import yaml
-import random as rd
-import time
 import re
 from crawler.generalCrawler import Crawler
-from bs4 import BeautifulSoup
 import matplotlib.pyplot as plt
 from nltk.corpus import stopwords
 
@@ -33,7 +28,6 @@ def list_refine(ls, regular:str, regular_2:str):
     ls = [w for w in ls if w not in stopwords.words('english')]
     ls = [item for item in ls if item.strip() or len(item) > 1]
     return ls
-
 
 def visualize(tuple_list:list, rang:int):
     plt.scatter(*zip(*tuple_list[:rang]))

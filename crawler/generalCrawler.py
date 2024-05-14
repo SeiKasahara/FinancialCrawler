@@ -36,15 +36,15 @@ class Crawler:
             time.sleep(rd.randint(1,6))
             try:
                 response = requests.get(url, headers=self.headers)
-                soup = BeautifulSoup(response.content, 'lxml')
-                start = url.find("//") + 2
-                end = url.find("/", start)
-                hostname = url[start:end]
-                hostname = hostname.replace(".", "_")
-                self.__sitemap_sub_links[hostname] = [element.text for element in soup.find_all('loc')]
             except:
-                print("error!")
-                continue
+                raise TimeoutError
+            soup = BeautifulSoup(response.content, 'lxml')
+            start = url.find("//") + 2
+            end = url.find("/", start)
+            hostname = url[start:end]
+            hostname = hostname.replace(".", "_")
+            self.__sitemap_sub_links[hostname] = [element.text for element in soup.find_all('loc')]
+
         self.dict_to_insert_sql()
         if flag:
             return self.__sitemap_sub_links
