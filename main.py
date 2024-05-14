@@ -1,4 +1,5 @@
 import requests
+import yaml
 import random as rd
 import time
 import re
@@ -10,7 +11,6 @@ from nltk.corpus import stopwords
 regular = r" |▮|,|\.|'|!|@|#|\$|%|\^|&|\*|\n|\r|\t|-|–|’|：|……|（|）|\[|\]|《|》|\||！|，|。|；|\/|”|“|？|:|;|\\"
 regular_2 = "\\【.*?】+|\\《.*?》+|\\#.*?#+|[.!/_,$&%^*()<>+""'?@|:~{}#]+|[——！\\\，。=？、：“”‘’￥……（）《》【】]\n\r\t"
 url_list = []
-sitemap_list = []
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
@@ -71,8 +71,13 @@ def visualize(tuple_list:list, rang:int):
     plt.xticks(rotation=45)
     plt.show()
 
+def read_yaml(file:str):
+    with open(file,encoding='utf-8') as file1:
+        data = yaml.load(file1,Loader=yaml.FullLoader) # read yaml file
+    return data
+
 if __name__ == "__main__": 
-    sitemap_list.append("https://www.fool.com.au/post-sitemap115.xml")
+    sitemap_list = read_yaml('website.yaml')
     links = get_sitemap_links(sitemap_list, headers)
     url_list += links[:3]
     texts = request(url_list, headers)
