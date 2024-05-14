@@ -7,5 +7,15 @@
             URL: <input type="text" name="url"><br>
             <input type="submit" value="Submit"><br>
         </form>
+        <form method="POST">
+            Query: <input type="text" name="query"><br>
+            <input type="submit" value="Submit"><br>
+        </form>
+        <h1>Results:</h1>
+        <ul>
+        {% for item in result %}
+            <li>{{ item }}</li>
+        {% endfor %}
+        </ul>
     </body>
 </html>
