@@ -1,7 +1,5 @@
-import re
 from crawler.generalCrawler import Crawler
 import matplotlib.pyplot as plt
-from nltk.corpus import stopwords
 
 def visualize(tuple_list:list, rang:int):
     plt.scatter(*zip(*tuple_list[:rang]))

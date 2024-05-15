@@ -1,9 +1,13 @@
-import re
+import sys
 import os
-import sqlite3
-from crawler.generalCrawler import Crawler
+
+current_path = os.path.dirname(os.path.abspath(__file__))
+root_path = os.path.dirname(current_path)
+sys.path.append(root_path)
+
+import re
+from crawler.listCrawler import listCrawler
 from nltk.corpus import stopwords
-import concurrent.futures
 
 regular = r" |▮|,|\.|'|!|@|#|\$|%|\^|&|\*|\n|\r|\t|-|–|’|：|……|（|）|\[|\]|《|》|\||！|，|。|；|\/|”|“|？|:|;|\\"
 regular_2 = "\\【.*?】+|\\《.*?》+|\\#.*?#+|[.!/_,$&%^*()<>+""'?@|:~{}#]+|[——！\\\，。=？、：“”‘’￥……（）《》【】]\n\r\t"
@@ -19,8 +23,8 @@ def calculate(word_list:list):
             word_dict[word] += 1
         else:
             word_dict[word] = 1
-    word_dict = sorted(word_dict.items(), key= lambda item:item[1], reverse=True) #sort
-    return word_dict
+    word_tuple_list = sorted(word_dict.items(), key= lambda item:item[1], reverse=True) #sort
+    return word_tuple_list
 
 def list_refine(ls, regular:str, regular_2:str):
     ls = re.split(regular, ls)
@@ -30,38 +34,21 @@ def list_refine(ls, regular:str, regular_2:str):
     ls = [item for item in ls if item.strip() or len(item) > 1]
     return ls
 
-def path_getter(filename:str):
-    database_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'database')
-    os.makedirs(database_path, exist_ok=True)
-    return os.path.join(database_path, filename)
+def dict_cleaning_calculate(text_dict:dict, regular:str, regular_2:str):
+    new_dict = {}
+    for url_name, text in text_dict.items():
+        text = text.strip()
+        text = list_refine(text, regular, regular_2)
+        text = calculate(text)
+        new_dict[url_name] = text
+    return new_dict
 
-def fetch_data(table_name, filename):
-    conn = sqlite3.connect(path_getter(filename))
-    c = conn.cursor()
-    c.execute(f"SELECT * FROM {table_name}")
-    rows = c.fetchall()
-    conn.close()
-    return [row[0] for row in rows] #only return the first col data
-
-def sql_reader(filename:str):
-    conn = sqlite3.connect(path_getter(filename))
-    c = conn.cursor()
-    c.execute("SELECT name FROM sqlite_master WHERE type='table';")
-    tables = c.fetchall()
-    conn.close()
-    return tables
-
-def main():
-    filename = 'sitemap.db'
-    tables = sql_reader(filename)
-    # create a thread
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        results = executor.map(fetch_data, [table_name[0] for table_name in tables], [filename]*len(tables))
-    for result in results:
-        print(result)
-
-def sql_saver():
-    pass
+def main(regular, regular_2):
+    craw = listCrawler()
+    craw.sitemap_list_getter('sitemap.db')
+    text_dict = craw.get_words(True, 3, True)
+    text_dict = dict_cleaning_calculate(text_dict, regular, regular_2)
+    print(text_dict)
 
 if __name__ == '__main__':
-    main()
+    main(regular, regular_2)

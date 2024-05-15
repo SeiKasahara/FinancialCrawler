@@ -21,6 +21,11 @@ class Crawler:
         self.__url_list = []
         self.__sitemap_sub_links = {} # sitemap of a site
         self.file = ""
+    
+    def path_getter(self, filename:str):
+        database_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'database')
+        os.makedirs(database_path, exist_ok=True)
+        return os.path.join(database_path, filename)
 
     def get_file_and_read(self, file:str):
         file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', file)
@@ -60,9 +65,7 @@ class Crawler:
     def dict_to_insert_sql(self):
         if len(self.__sitemap_sub_links) == 0:
             return
-        database_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'database')
-        os.makedirs(database_path, exist_ok=True)
-        conn = sqlite3.connect(os.path.join(database_path, 'sitemap.db'))
+        conn = sqlite3.connect(self.path_getter('sitemap.db'))
         c = conn.cursor()
         # Create Table
         for site, urls in self.__sitemap_sub_links.items():
