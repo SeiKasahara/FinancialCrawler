@@ -49,7 +49,6 @@ def home():
                     yaml.safe_dump(analyse_result, file)
             except IOError:
                 return alert_and_redirect('Failed to write to file')
-            return alert_and_redirect('Sites added successfully!')
 
         if url:
             if not is_sitemap_url(url):
